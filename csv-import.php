@@ -2,9 +2,10 @@
 function glossario_csv_import_processing()
 {
     global $wpdb;
-    $terms_table   = $wpdb->prefix . 'terms';
-    $posts_table   = $wpdb->prefix . 'posts';
-    $glossario_submit_btn = $_POST['glossario_submit_btn'] ?? '';
+    $terms_table            = $wpdb->prefix . 'terms';
+    $term_taxonomy_table    = $wpdb->prefix . 'term_taxonomy';
+    $posts_table            = $wpdb->prefix . 'posts';
+    $glossario_submit_btn   = $_POST['glossario_submit_btn'] ?? '';
 
     if ($glossario_submit_btn == 'Upload glossario CSV') {
 
@@ -31,16 +32,14 @@ function glossario_csv_import_processing()
                     $gallery        = $single_data[3] ?? '';
                     $category       = $single_data[4] ?? '';
 
-                    $cat_result = $wpdb->get_row("SELECT * FROM $terms_table WHERE name = '{$category}'");
-
-
                     $post_result = $wpdb->get_row("SELECT * FROM $posts_table WHERE post_title = '{$title}' AND post_type ='glossario' AND post_status ='publish'");
-
 
                     $is_title = $post_result->post_title ?? '';
 
                     if ($is_title) {
                     } else {
+
+                        $cat_result = $wpdb->get_row("SELECT * FROM $terms_table, $term_taxonomy_table WHERE name = '{$category}' AND $terms_table.term_id=$term_taxonomy_table.term_id AND $term_taxonomy_table.taxonomy ='glossario-cat'");
 
                         $cat_id = 0;
                         if (isset($cat_result->term_id)) {
@@ -61,12 +60,14 @@ function glossario_csv_import_processing()
                             'post_status'   => 'publish',
                             'post_author'   => 1,
                             'post_type'   => 'glossario',
-                            'tax_input' => array(
-                                'glossario-cat' => array($cat_id)
-                            )
                         );
 
                         $post_ID = wp_insert_post($my_post);
+
+                        if ($cat_id != 0) {
+                            $tags       = array($cat_id);
+                            wp_set_post_terms($post_ID, $tags, 'glossario-cat');
+                        }
 
                         add_post_meta($post_ID, 'gmdl_title_tree', $spelling);
                         add_post_meta($post_ID, 'gmdl_description', $description);
@@ -102,6 +103,3 @@ function glossario_csv_import_processing()
         }
     }
 }
-
-
-
