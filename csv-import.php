@@ -68,6 +68,23 @@ function glossario_csv_import_processing()
                             $tags       = array($cat_id);
                             wp_set_post_terms($post_ID, $tags, 'glossario-cat');
                         }
+                        
+                        
+                        // start multiple 
+                        // $brand_cat = array();
+                        // if ($cat_id > 0) {
+                        //     $brand_cat[0] = $cat_id;
+                        // }
+
+                        // if ($reg_id > 0) {
+                        //     $brand_cat[1] = $reg_id;
+                        // }
+
+                        // if ($city_id > 0) {
+                        //     $brand_cat[2] = $city_id;
+                        // }
+                        // wp_set_post_terms($post_ID, $brand_cat, 'brand_cat');
+                        // start multiple 
 
                         add_post_meta($post_ID, 'gmdl_title_tree', $spelling);
                         add_post_meta($post_ID, 'gmdl_description', $description);
